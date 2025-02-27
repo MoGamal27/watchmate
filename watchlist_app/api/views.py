@@ -1,17 +1,17 @@
-from watchlist_app.models import Movie
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from watchlist_app.api.serializers import MovieSerializer
-
-@api_view()
-def movie_list(request):
-    movies = Movie.objects.all()
-    serializer = MovieSerializer(movies, many=True)
-    return Response(serializer.data)
+from rest_framework import generics
+from .serializers import WatchListSerializer, StreamPlatformSerializer, ReviewSerializer
+from watchlist_app.models import WatchList, StreamPlatform, Review
 
 
-@api_view()
-def movie_detail(request, pk):
-    movie = Movie.objects.get(pk=pk)
-    serializer = MovieSerializer(movie)
-    return Response(serializer.data)
+class UserReview(generics.ListAPIView):
+    
+    serializer_class = ReviewSerializer
+    
+    
+    def get_queryset(self):
+        user = self.request.query_params.get('username', None)
+        return Review.objects.filter(review_user__username=user)
+    
+
+
+ 
